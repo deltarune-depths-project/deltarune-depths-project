@@ -236,6 +236,10 @@ class BattleController:
         self.actions_queue = ActionsQueue()
         self.sorted_actions_queue = {}
 
+        # A variable that suppresses user inputs from executing the next action in the actions queue until the current
+        # action resets it to True
+        self.execute_queued_player_actions_on_input = True
+
         self.items = items.consumable_items.initialize_default_consumable_items()
 
         self.fight_box_sprites_array = []
@@ -1072,51 +1076,66 @@ class BattleController:
         self.sorted_actions_queue = self.actions_queue.sort_actions_queue()
         self.actions_queue.clear()
 
+    def enable_executing_queued_player_actions(self):
+        """
+        Prevents execute_queued_player_action from doing anything.
+        :return: None
+        """
+        self.execute_queued_player_actions_on_input = True
+
+    def disable_executing_queued_player_actions(self):
+        """
+        Prevents execute_queued_player_action from doing anything.
+        :return: None
+        """
+        self.execute_queued_player_actions_on_input = False
+
     def execute_queued_player_action(self):
         """
         Executes the highest priority player action.
         :return: None
         """
-        if self.check_if_battle_is_won():
-            self.end_battle()
-            return
+        if self.execute_queued_player_actions_on_input:
+            if self.check_if_battle_is_won():
+                self.end_battle()
+                return
 
-        if len(self.sorted_actions_queue["complex_act_actions"]) > 0:
-            self.sorted_actions_queue["act_actions"].pop().execute()
-            return
-        elif len(self.sorted_actions_queue["simple_act_actions"]) > 0:
-            """
-            act_texts = ""
-            for action in self.sorted_actions_queue["simple_act_actions"]:
-                act_text = self.sorted_actions_queue["simple_act_actions"].pop().execute()
-                act_texts += "* " + act_text + "\n"
-            self.battle_textbox.load_dialog(TextBoxDialog(act_texts))
-            """
-            self.sorted_actions_queue["simple_act_actions"].pop().execute()
-            return
-        elif len(self.sorted_actions_queue["magic_spare_item_actions"]) > 0:
-            self.sorted_actions_queue["magic_spare_item_actions"].pop().execute()
-            return
-        elif len(self.sorted_actions_queue["fight_actions"]) > 0:
-            self.state = BattleState.PLAYER_ATTACKING
-            self.battle_textbox.clear_dialog()
-            fighting_players = []
-            enemy_targets = []
-            for fight_action in self.sorted_actions_queue["fight_actions"]:
-                fighting_players.insert(0, fight_action.actor)
-                enemy_targets.insert(0, fight_action.target)
-            self.sorted_actions_queue["fight_actions"].clear()
-            self.spawn_fight_bars(fighting_players, enemy_targets)
-            return
-        else:
-            # For every player that is not defending or downed, reset their animation state to battle_idle.
-            for player in self.players:
-                if not (player.is_player_downed() or player.is_player_defending()):
-                    player.set_animation_state("battle_idle")
+            if len(self.sorted_actions_queue["complex_act_actions"]) > 0:
+                self.sorted_actions_queue["act_actions"].pop().execute()
+                return
+            elif len(self.sorted_actions_queue["simple_act_actions"]) > 0:
+                """
+                act_texts = ""
+                for action in self.sorted_actions_queue["simple_act_actions"]:
+                    act_text = self.sorted_actions_queue["simple_act_actions"].pop().execute()
+                    act_texts += "* " + act_text + "\n"
+                self.battle_textbox.load_dialog(TextBoxDialog(act_texts))
+                """
+                self.sorted_actions_queue["simple_act_actions"].pop().execute()
+                return
+            elif len(self.sorted_actions_queue["magic_spare_item_actions"]) > 0:
+                self.sorted_actions_queue["magic_spare_item_actions"].pop().execute()
+                return
+            elif len(self.sorted_actions_queue["fight_actions"]) > 0:
+                self.state = BattleState.PLAYER_ATTACKING
+                self.battle_textbox.clear_dialog()
+                fighting_players = []
+                enemy_targets = []
+                for fight_action in self.sorted_actions_queue["fight_actions"]:
+                    fighting_players.insert(0, fight_action.actor)
+                    enemy_targets.insert(0, fight_action.target)
+                self.sorted_actions_queue["fight_actions"].clear()
+                self.spawn_fight_bars(fighting_players, enemy_targets)
+                return
+            else:
+                # For every player that is not defending or downed, reset their animation state to battle_idle.
+                for player in self.players:
+                    if not (player.is_player_downed() or player.is_player_defending()):
+                        player.set_animation_state("battle_idle")
 
-            # Start the pre enemy attack dialog.
-            self.start_pre_enemy_attack_dialog()
-            return
+                # Start the pre enemy attack dialog.
+                self.start_pre_enemy_attack_dialog()
+                return
 
     def start_pre_enemy_attack_dialog(self):
         """
