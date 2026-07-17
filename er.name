@@ -1,0 +1,25 @@
+* [33m92b4243[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fixed some weird bugs
+*   [33m4ccf8fc[m[33m ([m[1;31morigin/test-branch[m[33m, [m[1;32mmulti-player-act[m[33m)[m Merge pull request #50 from noah-gilgo/soul-fragment-fix
+[32m|[m[33m\[m  
+[32m|[m * [33m1a2b9c4[m[33m ([m[1;32msoul-fragment-fix[m[33m)[m Made Dess unused
+[32m|[m * [33m0920d8e[m Reduced default delays on spare and act
+[32m|[m * [33mf8a3b49[m Character icons revert to default once they do an attack.
+[32m|[m * [33mf251e13[m Character icons revert to default once they do their act, save for FIGHTing.
+[32m|[m * [33m24883c0[m Added Variks sword/armor and gave it to Kris because why not.
+[32m|[m * [33m811c251[m Fixed a bug where reviving a player always set their HP to 20% of their total HP.
+[32m|[m * [33md9c3422[m Characters still shake when downed
+[32m|[m * [33ma121f74[m Fixed the starting dimensions for the background gui sprite thingy
+[32m|[m * [33m167a78c[m Added border/background sprites to the clamshell display
+[32m|[m * [33mab4efae[m Spell names are now in all caps when cast
+[32m|[m * [33m290f8d0[m Fixed the soul fragment bug.
+[32m|[m * [33m1223e06[m Added sound to sleepmist spellcasting.
+[32m|[m[32m/[m  
+*   [33mc31d4b0[m Merge pull request #49 from noah-gilgo/rude-buster-damage-multiplier
+[34m|[m[35m\[m  
+[34m|[m * [33m722bda4[m[33m ([m[1;32mrude-buster-damage-multiplier[m[33m)[m Fixed a bug where casting Fireshock would crash the game.
+[34m|[m * [33mc95eefd[m Rude Buster's animation now scales correctly and does the correct damage with player input
+[34m|[m * [33ma05c7d1[m Made Rude Buster's damage/animation be amplified by user input.
+[34m|[m * [33mc30f3c6[m Removed parameters from affect_targets_with_spell. All previous parameters are passed in during the cast_spell call.
+[34m|[m[34m/[m  
+*   [33ma998f2c[m Merge pull request #48 from noah-gilgo/state_machine_update
+[36m|[m[1;31m\[m  
