@@ -1,4 +1,5 @@
-from act import SimpleAct, MagicUserAct
+from act import SimpleAct, MagicUserAct, MultiUserAct
+#from player_characters import Susie
 from speech_bubble import SpeechBubbleDialog
 
 
@@ -60,6 +61,19 @@ class RudinnLecture(SimpleAct):
                     actor=enemy
                 )
             )
+
+
+class RedBuster(MultiUserAct):
+    def __init__(self):
+        from player_characters import Susie
+        super().__init__(
+            name="Red Buster",
+            perform_act_text="Your SOUL shined its power on Susie!",
+            description="Red Damage",
+            tp_cost=60,
+            additional_actors=[Susie],
+            additional_actors_animation_states=["battle_act_ready"]
+        )
 
 
 # Magic user acts

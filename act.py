@@ -92,3 +92,40 @@ class MagicUserAct(SimpleAct):
         self.mercy_percentage = mercy_percentage
         self.tired_percentage = tired_percentage
 
+
+class MultiUserAct(SimpleAct):
+    """
+    An act that requires multiple users to cast.
+
+    Can only be used by ACT users instead of MAGIC users, as of right now. Kris is the only character to use ACTs of
+    this sort in the actual game.
+    """
+
+    def __init__(
+        self,
+        name: str = "Placeholder Act Name",
+        description: str = "Performs an act",
+        tp_cost: float = 0.0,
+        perform_act_text: str = "You just performed an act!",
+        mercy_percentage: float = 0.0,
+        tired_percentage: float = 0.0,
+        actor_animation_state: str = "",
+        additional_actors: list = [],
+        additional_actors_animation_states: list[str] = [],
+    ):
+        super().__init__(name, description, tp_cost, perform_act_text, mercy_percentage, tired_percentage,
+                         actor_animation_state)
+
+        self.additional_actors = additional_actors
+        self.additional_actors_animation_states = additional_actors_animation_states
+
+    def perform_act(self, actor, target, dialogue_box, players):
+        super().perform_act(actor, target, dialogue_box)
+        additional_player_index = 0
+        for additional_actor in self.additional_actors:
+            for player in players:
+                if isinstance(player, additional_actor):
+                    if self.additional_actors_animation_states[additional_player_index] in player.get_animations_by_state():
+                        player.set_animation_state(self.additional_actors_animation_states[additional_player_index])
+                    break
+
