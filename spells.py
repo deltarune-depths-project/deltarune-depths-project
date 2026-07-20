@@ -332,7 +332,8 @@ class HealPrayer(Spell):
 
 
 class RudeBuster(Spell):
-    def __init__(self):
+    def __init__(self, beam_texture_path: str = "assets/sprites/effects/rude_buster_beam",
+                 beam_scale_multiplier: float = 1.0):
         super().__init__(
             name="Rude Buster",
             description="Rude Damage",
@@ -343,12 +344,15 @@ class RudeBuster(Spell):
             is_healing_spell=False,
             is_pacifying_spell=False,
             is_aoe_spell=False,
-            animation=RudeBusterAnimation(caster=None, target=None),
+            animation=RudeBusterAnimation(caster=None, target=None, beam_texture_path=beam_texture_path, beam_scale_multiplier=beam_scale_multiplier),
             time_before_battle_idle=1.4,
             time_before_animation_begins=0.8,
             time_before_target_affected_by_spell=1.3,
             time_before_player_can_advance_past_spell=2.4
         )
+
+        self.beam_texture_path = beam_texture_path
+        self.beam_scale_multiplier = beam_scale_multiplier
 
         # This is the amount of additional damage that will be dealt by Rude Buster depending on the frame
         self.damage_addition_amount_list = [30, 28, 20, 13, 11, 10, 7]
@@ -394,7 +398,7 @@ class RudeBuster(Spell):
         """ Animate the spell being cast. """
         if self.animation:
             target = targets[0]
-            new_animation = self.animation.__class__(caster, target, sprites_and_effects_collection)
+            new_animation = self.animation.__class__(caster, target, sprites_and_effects_collection, self.beam_texture_path, self.beam_scale_multiplier)
             sprites_and_effects_collection.effects.append(new_animation)
             new_animation.center_x = target.center_x
             new_animation.center_y = target.center_y
@@ -412,6 +416,22 @@ class RudeBuster(Spell):
                         sprites_and_effects_collection.effects_sprites_3.append(animated_sprite.sprite)
 
             new_animation.parent_spell = self
+
+
+class RedBuster(RudeBuster):
+    def __init__(self):
+        super().__init__(beam_texture_path="assets/sprites/effects/red_buster_beam", beam_scale_multiplier=1.15)
+        self.name = "Red Buster"
+        self.description = "Red Damage"
+        self.tp_cost = 60
+        self.element_id = 9
+
+    def spell_damage_function(self, caster, target):
+        if self.frames_between_confirm_and_impact < len(self.damage_addition_amount_list):
+            confirm_damage = self.damage_addition_amount_list[self.frames_between_confirm_and_impact]
+        else:
+            confirm_damage = 0
+        return (caster.get_total_attack() * 13) + (caster.get_total_magic() * 6) - (target.defense * 6) + confirm_damage + 90
 
 
 class SleepMist(Spell):

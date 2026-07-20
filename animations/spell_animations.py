@@ -487,19 +487,19 @@ class RudeBusterBeam(Sprite):
     The "wave" sprite that makes up the Rude Buster when Susie casts it.
     """
     def __init__(self, beam_textures: list[Texture], center_x: float = 0.0, center_y: float = 0.0,
-                 scale: float = 4.5, angle: float = 0.0):
+                 scale: float = 4.0, angle: float = 0.0, beam_scale_multiplier: float = 1.0):
         """
         :param beam_textures: The textures that the beam sprites cycle through to create the illusion of movement.
         :param center_x: The x coordinate of the center of the beam.
         :param center_y: The y coordinate of the center of the beam.
-        :param height: The height of the sprite when spawned.
+        :param beam_scale_multiplier: Multiplies the height of the sprite when spawned.
         :param angle: The angle of the sprite when spawned.
         """
         super().__init__(
             center_x=center_x,
             center_y=center_y,
             angle=angle,
-            scale=scale
+            scale=scale * beam_scale_multiplier
         )
         for texture in beam_textures:
             self.append_texture(texture)
@@ -507,6 +507,9 @@ class RudeBusterBeam(Sprite):
         self.texture_cycle_rate = 0.1 # Amount of time that passes between texture changes
         self.time = 0.0
         self.lifetime = 3.0
+        self.beam_scale_multiplier = beam_scale_multiplier
+        self.scale_x *= self.beam_scale_multiplier
+        self.scale_y *= self.beam_scale_multiplier
 
         self.number_of_textures = len(self.textures)
 
@@ -524,32 +527,35 @@ class RudeBusterTrailingBeam(RudeBusterBeam):
     The trailing beam that follows the main beam.
     """
     def __init__(self, beam_textures: list[Texture], center_x: float = 0.0, center_y: float = 0.0,
-                 scale: float = 2.5, angle: float = 0.0):
-        super().__init__(beam_textures, center_x, center_y, scale, angle)
+                 scale: float = 3.0, angle: float = 0.0, beam_scale_multiplier: float = 1.0):
+        super().__init__(beam_textures, center_x, center_y, scale, angle, beam_scale_multiplier)
         self.alpha = 128
-        self.scale = 3.0
 
     def update_animation(self, delta_time):
         super().update_animation(delta_time)
-        if self.time > 0.12:
-            self.alpha -= 600 * delta_time
-            self.scale_y -= 8 * delta_time
+        if self.time > 0.06:
+            self.alpha -= 400 * delta_time
+            self.scale_y -= 10 * delta_time * self.beam_scale_multiplier
 
 
 class RudeBusterImpactAnimation(MultiSpriteAnimation):
     """
     The Rude Buster sprites created on impact with the target.
     """
-    def __init__(self, beam_textures: list[Texture], center_x: float = 0.0, center_y: float = 0.0, spread_multiplier: float = 1.0):
+    def __init__(self, beam_textures: list[Texture], center_x: float = 0.0, center_y: float = 0.0, spread_multiplier: float = 1.0,
+                 beam_scale_multiplier: float = 1.0):
+        # A multiplier for the height of each beam sprite
+        self.beam_scale_multiplier = beam_scale_multiplier
+
         sprites=[
-            RudeBusterBeam(beam_textures, center_x + 50, center_y - 50, 4.0, 45.0),
-            RudeBusterBeam(beam_textures, center_x + 50, center_y - 50, 4.0, 45.0),
-            RudeBusterBeam(beam_textures, center_x - 50, center_y - 50, 4.0, 135.0),
-            RudeBusterBeam(beam_textures, center_x - 50, center_y - 50, 4.0, 135.0),
-            RudeBusterBeam(beam_textures, center_x - 50, center_y + 50, 4.0, 225.0),
-            RudeBusterBeam(beam_textures, center_x - 50, center_y + 50, 4.0, 225.0),
-            RudeBusterBeam(beam_textures, center_x + 50, center_y + 50, 4.0, 315.0),
-            RudeBusterBeam(beam_textures, center_x + 50, center_y + 50, 4.0, 315.0)
+            RudeBusterBeam(beam_textures, center_x + 50, center_y - 50, 4.0, 45.0, self.beam_scale_multiplier),
+            RudeBusterBeam(beam_textures, center_x + 50, center_y - 50, 4.0, 45.0, self.beam_scale_multiplier),
+            RudeBusterBeam(beam_textures, center_x - 50, center_y - 50, 4.0, 135.0, self.beam_scale_multiplier),
+            RudeBusterBeam(beam_textures, center_x - 50, center_y - 50, 4.0, 135.0, self.beam_scale_multiplier),
+            RudeBusterBeam(beam_textures, center_x - 50, center_y + 50, 4.0, 225.0, self.beam_scale_multiplier),
+            RudeBusterBeam(beam_textures, center_x - 50, center_y + 50, 4.0, 225.0, self.beam_scale_multiplier),
+            RudeBusterBeam(beam_textures, center_x + 50, center_y + 50, 4.0, 315.0, self.beam_scale_multiplier),
+            RudeBusterBeam(beam_textures, center_x + 50, center_y + 50, 4.0, 315.0, self.beam_scale_multiplier)
         ]
 
         super().__init__(sprites)
@@ -599,7 +605,7 @@ class RudeBusterImpactAnimation(MultiSpriteAnimation):
 
                 one_minus_ease_out_circ = ease_out_circ(self.time / self.total_shrink_duration)
 
-                sprite.scale_x = max(0.1, 5.0 * one_minus_ease_out_circ)
+                sprite.scale_x = max(0.1, 5.0 * one_minus_ease_out_circ * self.beam_scale_multiplier)
                 sprite.alpha = max(1.0, 255 * one_minus_ease_out_circ)
                 sprite_index += 1
         else:
@@ -609,15 +615,21 @@ class RudeBusterImpactAnimation(MultiSpriteAnimation):
 
 class RudeBusterAnimation(MultiSpriteAnimation):
     def __init__(self, caster: character.Character = None, target: character.Character = None,
-                 sprites_and_effects_collection: SpritesAndEffectsCollection = None):
+                 sprites_and_effects_collection: SpritesAndEffectsCollection = None,
+                 beam_texture_path: str = "assets/sprites/effects/rude_buster_beam",
+                 beam_scale_multiplier: float = 1.0):
         if caster is not None and target is not None and sprites_and_effects_collection is not None:
             self.caster = caster
             self.target = target
             self.sprites_and_effects_collection = sprites_and_effects_collection
+            self.beam_texture_path = beam_texture_path
+            self.beam_scale_multiplier = beam_scale_multiplier
 
             self.rude_buster_beam_textures = load_textures_at_filepath_into_texture_array(
-                folder_path="assets/sprites/effects/rude_buster_beam"
+                folder_path=self.beam_texture_path
             )
+            print(self.beam_texture_path)
+
             self.number_of_wave_sprites = 18
             self.trajectory_arc_height = -70
 
@@ -632,7 +644,8 @@ class RudeBusterAnimation(MultiSpriteAnimation):
                 beam_textures=self.rude_buster_beam_textures,
                 center_x=self.rude_buster_arc_coordinates[0][0],
                 center_y=self.rude_buster_arc_coordinates[0][1],
-                angle=self.rude_buster_arc_coordinates[0][2]
+                angle=self.rude_buster_arc_coordinates[0][2],
+                beam_scale_multiplier=beam_scale_multiplier
             )
 
             super().__init__(
@@ -673,7 +686,8 @@ class RudeBusterAnimation(MultiSpriteAnimation):
                     beam_textures=self.rude_buster_beam_textures,
                     center_x=self.rude_buster_arc_coordinates[self.current_arc_coordinate_index][0],
                     center_y=self.rude_buster_arc_coordinates[self.current_arc_coordinate_index][1],
-                    angle=self.rude_buster_arc_coordinates[self.current_arc_coordinate_index][2]
+                    angle=self.rude_buster_arc_coordinates[self.current_arc_coordinate_index][2],
+                    beam_scale_multiplier=self.beam_scale_multiplier
                 )
                 self.current_arc_coordinate_index += 1
                 if self.current_arc_coordinate_index < self.number_of_wave_sprites:
@@ -706,7 +720,8 @@ class RudeBusterAnimation(MultiSpriteAnimation):
                     beam_textures=self.rude_buster_beam_textures,
                     center_x=self.target.center_x,
                     center_y=self.target.center_y,
-                    spread_multiplier=spread_multiplier
+                    spread_multiplier=spread_multiplier,
+                    beam_scale_multiplier=self.beam_scale_multiplier
                 )
                 for sprite in self.rude_buster_impact_animation.get_sprites():
                     self.sprites_and_effects_collection.effects_sprites.append(sprite)
