@@ -79,7 +79,7 @@ class Spell:
 
         # Tell the battle controller to postpone the player advancing their queued actions until the spell is complete.
         if self.time_before_player_can_advance_past_spell is not None:
-            controller.delay_player_from_advancing_to_next_state(self.time_before_player_can_advance_past_spell)
+            controller.delay_player_from_advancing_to_next_act(self.time_before_player_can_advance_past_spell)
 
     def spell_damage_function(self, caster, target) -> float:
         """
@@ -392,7 +392,7 @@ class RudeBuster(Spell):
 
         # Tell the battle controller to postpone the player advancing their queued actions until the spell is complete.
         if self.time_before_player_can_advance_past_spell is not None:
-            controller.delay_player_from_advancing_to_next_state(self.time_before_player_can_advance_past_spell)
+            controller.delay_player_from_advancing_to_next_act(self.time_before_player_can_advance_past_spell)
 
     def animate_spell(self, caster, targets: list[character.Character], sprites_and_effects_collection: SpritesAndEffectsCollection):
         """ Animate the spell being cast. """

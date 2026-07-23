@@ -6,12 +6,14 @@ class Act:
     An abstract Act method. The parent class that all types of acts should inherit from.
     """
     def __init__(self, name: str = "Placeholder Act Name", description: str = "Performs an act",
-                 perform_act_text: str = "", tp_cost: float = 0.0, time_before_player_can_advance_past_act: float = 0.5):
+                 perform_act_text: str = "", tp_cost: float = 0.0, time_before_player_can_advance_past_act: float = 0.5,
+                 suppress_actions_queue_update: bool = False):
         self.name = name  # The name of the act in the ACT menu.
         self.description = description  # The description of the act displayed in the ACT menu when hovered over.
         self.perform_act_text = perform_act_text  # Dialog box text when the act is performed
         self.tp_cost = tp_cost  # It's rare, but some acts have a TP cost.
         self.time_before_player_can_advance_past_act = time_before_player_can_advance_past_act  # If provided, the amount of time player input will be delayed while the spell is being cast
+        self.suppress_actions_queue_update = suppress_actions_queue_update  # If True, prevents user input from advancing the actions queue.
 
     def perform_act(self, actor, target, dialogue_box):
         """
@@ -35,9 +37,17 @@ class SimpleAct(Act):
             perform_act_text: str = "You just performed an act!",
             mercy_percentage: float = 0.0,
             tired_percentage: float = 0.0,
-            actor_animation_state: str = ""
+            actor_animation_state: str = "",
+            time_before_player_can_advance_past_act: float = 0.5,
+            suppress_actions_queue_update: bool = False
     ):
-        super().__init__(name, description, perform_act_text, tp_cost)
+        super().__init__(
+            name=name,
+            description=description,
+            perform_act_text=perform_act_text,
+            tp_cost=tp_cost,
+            time_before_player_can_advance_past_act=time_before_player_can_advance_past_act,
+            suppress_actions_queue_update=suppress_actions_queue_update)
         self.mercy_percentage = mercy_percentage  # Mercy granted to the enemy the act is performed on (between 0 and 100)
         self.tired_percentage = tired_percentage  # Tired granted to the enemy the act is performed on (between 0 and 100)
         self.actor_animation_state = actor_animation_state  # The animation the actor is briefly given when they perform the act.
@@ -81,11 +91,19 @@ class MagicUserAct(SimpleAct):
 
     def __init__(self, player, enemy_type: type, name: str = "", description: str = "",
                  perform_act_text: str = "", tp_cost: float = 0.0, mercy_percentage: float = 0.0,
-                 tired_percentage: float = 0.0):
+                 tired_percentage: float = 0.0, time_before_player_can_advance_past_act: float = 0.5,
+                 suppress_actions_queue_update: bool = False):
 
         if not name:
             name = player.name[0].upper() + "-Action"
-        super().__init__(name=name, description=description, perform_act_text=perform_act_text, tp_cost=tp_cost)
+        super().__init__(
+            name=name,
+            description=description,
+            perform_act_text=perform_act_text,
+            tp_cost=tp_cost,
+            time_before_player_can_advance_past_act=time_before_player_can_advance_past_act,
+            suppress_actions_queue_update=suppress_actions_queue_update
+        )
 
         self.player = player
         self.enemy_type = enemy_type
@@ -93,7 +111,7 @@ class MagicUserAct(SimpleAct):
         self.tired_percentage = tired_percentage
 
 
-class MultiUserAct(SimpleAct):
+class MultiUserAct(Act):
     """
     An act that requires multiple users to cast.
 
@@ -105,16 +123,21 @@ class MultiUserAct(SimpleAct):
         self,
         name: str = "Placeholder Act Name",
         description: str = "Performs an act",
+        perform_act_text: str = "",
         tp_cost: float = 0.0,
-        perform_act_text: str = "You just performed an act!",
-        mercy_percentage: float = 0.0,
-        tired_percentage: float = 0.0,
-        actor_animation_state: str = "",
+        time_before_player_can_advance_past_act: float = 0.5,
+        suppress_actions_queue_update: bool = False,
         additional_actors: list = [],
         additional_actors_animation_states: list[str] = [],
     ):
-        super().__init__(name, description, tp_cost, perform_act_text, mercy_percentage, tired_percentage,
-                         actor_animation_state)
+        super().__init__(
+            name,
+            description,
+            perform_act_text,
+            tp_cost,
+            time_before_player_can_advance_past_act,
+            suppress_actions_queue_update
+        )
 
         self.additional_actors = additional_actors
         self.additional_actors_animation_states = additional_actors_animation_states

@@ -220,8 +220,11 @@ class ActAction(Action):
             target=self.target,
             dialogue_box=self.controller.battle_textbox,
         )
-        if self.act.time_before_player_can_advance_past_act > 0.0:
-            self.controller.delay_player_from_advancing_to_next_state(self.act.time_before_player_can_advance_past_act)
+
+        if self.act.suppress_actions_queue_update:
+            self.controller.disable_executing_queued_player_actions()
+        elif self.act.time_before_player_can_advance_past_act > 0.0:
+            self.controller.delay_player_from_advancing_to_next_act(self.act.time_before_player_can_advance_past_act)
 
     def ready_act(self):
         # Performs code meant to be executed after selecting an act.
@@ -281,7 +284,7 @@ class ItemAction(Action):
             lambda dt: self.controller.use_consumable_item_on_targets(self.item, self.actor, self.targets), 0.5)
         if hasattr(self.item, "time_before_player_can_advance_past_item"):
             if self.item.time_before_player_can_advance_past_item > 0.0:
-                self.controller.delay_player_from_advancing_to_next_state(
+                self.controller.delay_player_from_advancing_to_next_act(
                     self.item.time_before_player_can_advance_past_item)
 
     def ready_act(self):
@@ -339,7 +342,7 @@ class SpareAction(Action):
         super().execute()
 
         # Prevents the user from advancing the dialog while the spare is being attempted.
-        self.controller.delay_player_from_advancing_to_next_state(0.5)
+        self.controller.delay_player_from_advancing_to_next_act(0.5)
 
         if self.target not in self.controller.enemies:
             self.target = self.controller.enemies[0]
