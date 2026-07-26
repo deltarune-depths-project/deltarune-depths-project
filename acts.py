@@ -77,7 +77,7 @@ class RudinnRedBuster(MultiUserAct):
             perform_act_text="Your SOUL shined its power on Susie!",
             description="Red Damage",
             tp_cost=60,
-            additional_actors=[Susie],
+            additional_actors=[Susie()],
             additional_actors_animation_states=["battle_magic_ready"]
         )
 
@@ -103,7 +103,7 @@ class RudinnRedBuster(MultiUserAct):
 
         spell_caster = None
         for player in controller.players:
-            if isinstance(player, self.additional_actors[0]):
+            if isinstance(player, type(self.additional_actors[0])):
                 spell_caster = player
                 break
 

@@ -147,7 +147,7 @@ class MultiUserAct(SimpleAct):
         additional_player_index = 0
         for additional_actor in self.additional_actors:
             for player in controller.players:
-                if isinstance(player, additional_actor):
+                if isinstance(player, type(additional_actor)):
                     if self.additional_actors_animation_states[additional_player_index] in player.get_valid_animation_states():
                         player.set_animation_state(self.additional_actors_animation_states[additional_player_index])
                     break

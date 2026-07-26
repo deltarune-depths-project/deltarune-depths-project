@@ -1841,7 +1841,7 @@ class ActListOption(UIBoxLayout):
 
         if hasattr(act, "additional_actors"):
             for actor in act.additional_actors:
-                children.append(ActListOptionIcon(icon_texture=actor().normal_icon_texture))
+                children.append(ActListOptionIcon(icon_texture=actor.normal_icon_texture))
 
         children.append(ActListOptionName(act, color))
 
