@@ -93,11 +93,11 @@ class RudinnRedBuster(MultiUserAct):
         soul_shining_animation = SoulShiningAnimation(actor)
         pyglet.clock.schedule_once(
             lambda dt: controller.sprites_and_effects_collection.effects.append(soul_shining_animation),
-            0.5
+            0.4
         )
         pyglet.clock.schedule_once(
             lambda dt: controller.sprites_and_effects_collection.effects_sprites.append(soul_shining_animation.sprite),
-            0.5
+            0.4
         )
 
 

@@ -704,7 +704,7 @@ class SoulShiningAnimation(SingleSpriteAnimation):
             sprite=soul_shine_sprite
         )
 
-        self.animation_framerate = 0.03
+        self.animation_framerate = 0.04
         self.total_duration = self.animation_framerate * len(soul_shine_textures)
 
     def update_animation(self, delta_time: float):
