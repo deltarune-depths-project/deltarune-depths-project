@@ -255,6 +255,7 @@ class ActAction(Action):
                         player_card.enable_focus()
 
         self.controller.change_player_icon()
+        self.controller.add_tp_to_meter(self.act.tp_cost)
 
 
 """

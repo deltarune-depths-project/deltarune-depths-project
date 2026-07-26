@@ -1453,6 +1453,7 @@ class SelectCommand(Command):
                     )
 
                     self.controller.move_to_next_player_card(act_action)
+                    self.controller.add_tp_to_meter(-selected_act.tp_cost)
                 return
 
             case BattleState.PLAYER_MAGIC_SELECT:
