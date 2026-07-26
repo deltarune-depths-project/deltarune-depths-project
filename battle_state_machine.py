@@ -107,8 +107,8 @@ class BattleController:
         # Susie: "My weapon's like a hairbrush or something."
         # Gerson: "Geh-hahahahaha! Is that so? Is that SO???"
         # Susie: "Yep. Now shut up and give me that axe!"
-        # self.scripted_dialogue = []
-
+        self.scripted_dialogue = []
+        """
         self.scripted_dialogue = [
             DialogExchange(
                 battle_textbox=self.battle_textbox,
@@ -177,6 +177,7 @@ class BattleController:
                 ]
             )
         ]
+        """
 
         # The current dialog exchange being loaded by the fight.
         self.current_dialog_exchange = None
@@ -1172,9 +1173,12 @@ class BattleController:
         """
         self.despawn_speech_bubbles()
 
-        execute_next_dialog = self.current_dialog_exchange.execute_next_dialog()
-        if isinstance(execute_next_dialog, SpeechBubble):
-            self.active_speech_bubbles.append(execute_next_dialog)
+        execute_next_dialog = None
+
+        if self.current_dialog_exchange:
+            execute_next_dialog = self.current_dialog_exchange.execute_next_dialog()
+            if isinstance(execute_next_dialog, SpeechBubble):
+                self.active_speech_bubbles.append(execute_next_dialog)
 
         if not execute_next_dialog:
             self.start_enemy_attack()

@@ -6,7 +6,7 @@ from actions import SpellAction
 from animations.battle_animations import SoulShiningAnimation
 #from player_characters import Susie
 from speech_bubble import SpeechBubbleDialog
-from spells import RedBuster
+from spells import RedBuster, HealPrayer, DualHeal
 
 
 # SimpleActs
@@ -117,6 +117,55 @@ class RudinnRedBuster(MultiUserAct):
             )
         )
 
+
+class RudinnDualHeal(MultiUserAct):
+    def __init__(self):
+        from player_characters import Ralsei
+        super().__init__(
+            name="Dual Heal",
+            perform_act_text="Your SOUL shined its power on Ralsei!",
+            description="Heals everyone",
+            tp_cost=50,
+            additional_actors=[Ralsei()],
+            additional_actors_animation_states=["battle_magic_ready"]
+        )
+
+        self.shine_sound = arcade.load_sound(path="assets/audio/battle/snd_boost.wav")
+
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller)
+
+        # Play the sound associated with the soul shining.
+        pyglet.clock.schedule_once(lambda dt: self.shine_sound.play(), 0.5)
+
+        # Play the soul shining animation.
+        soul_shining_animation = SoulShiningAnimation(actor)
+        pyglet.clock.schedule_once(
+            lambda dt: controller.sprites_and_effects_collection.effects.append(soul_shining_animation),
+            0.4
+        )
+        pyglet.clock.schedule_once(
+            lambda dt: controller.sprites_and_effects_collection.effects_sprites.append(soul_shining_animation.sprite),
+            0.4
+        )
+
+
+        spell_caster = None
+        for player in controller.players:
+            if isinstance(player, type(self.additional_actors[0])):
+                spell_caster = player
+                break
+
+        # Add a SpellAction to the beginning of the actions queue.
+
+        controller.sorted_actions_queue["simple_act_actions"].insert(0,
+            SpellAction(
+                actor=spell_caster,
+                targets=controller.players,
+                spell=DualHeal(),
+                controller=controller
+            )
+        )
 
 
 # Magic user acts

@@ -330,6 +330,34 @@ class HealPrayer(Spell):
         """
         return 5 * caster.get_total_magic()
 
+class DualHeal(Spell):
+    def __init__(self):
+        super().__init__(
+            name="Dual Heal",
+            description="Heal Ally",
+            tp_cost=50,
+            base_health_change=0,
+            is_friendly_spell=True,
+            is_healing_spell=True,
+            is_pacifying_spell=False,
+            is_aoe_spell=True,
+            animation=HealAnimation(target=None),
+            time_before_battle_idle=0.9,
+            time_before_animation_begins=0.5,
+            time_before_target_affected_by_spell=0.5,
+            time_before_player_can_advance_past_spell=1.5
+        )
+
+    def spell_healing_function(self, caster) -> float:
+        """
+        Calculates the damage healed by the spell depending on caster stats.
+        :return:
+        """
+        return 4 * caster.get_total_magic()
+
+    def cast_spell(self, caster, targets, controller):
+        super().cast_spell(caster, targets, controller)
+
 
 class RudeBuster(Spell):
     def __init__(self, beam_texture_path: str = "assets/sprites/effects/rude_buster_beam",
