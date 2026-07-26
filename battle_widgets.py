@@ -1897,7 +1897,19 @@ class ActList(UIGridLayout):
 
             act_index = 1
             for act in character.acts:
-                if controller.tp_meter.get_tp_in_meter() >= act.tp_cost:
+                all_actors_found = True
+                if hasattr(act, "additional_actors"):
+                    for actor in act.additional_actors:
+                        actor_found = False
+                        for player in controller.players:
+                            if isinstance(player, type(actor)):
+                                actor_found = True
+                                break
+                        if not actor_found:
+                            all_actors_found = False
+                            break
+
+                if controller.tp_meter.get_tp_in_meter() >= act.tp_cost and all_actors_found:
                     color = arcade.color.WHITE
                 else:
                     color = arcade.color.GRAY
