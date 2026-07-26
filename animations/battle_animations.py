@@ -685,9 +685,9 @@ class EnemyFleeingAnimation(MultiSpriteAnimation):
 class SoulShiningAnimation(SingleSpriteAnimation):
     def __init__(self, actor):
         soul_shine_sprite = Sprite(
-            center_x=actor.center_x,
-            center_y=actor.center_y,
-            scale=2.0
+            center_x=actor.center_x - 45,
+            center_y=actor.center_y - 15,
+            scale=3.0
         )
 
         soul_shine_textures = texture_methods.load_textures_at_filepath_into_texture_array(
@@ -704,7 +704,7 @@ class SoulShiningAnimation(SingleSpriteAnimation):
             sprite=soul_shine_sprite
         )
 
-        self.animation_framerate = 0.05
+        self.animation_framerate = 0.03
         self.total_duration = self.animation_framerate * len(soul_shine_textures)
 
     def update_animation(self, delta_time: float):
@@ -716,4 +716,5 @@ class SoulShiningAnimation(SingleSpriteAnimation):
                 self.sprite.set_texture(self.current_texture_index)
 
         if self.time > self.total_duration:
+            self.sprite.kill()
             self.terminate_animation()
