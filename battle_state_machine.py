@@ -628,6 +628,7 @@ class BattleController:
         :return:
         """
         self.actions_queue.push(action)
+        print("len of actions queue: " + str(len(self.actions_queue)))
 
         # Check if the next player character is downed. If so, skip over them.
         next_character_index_change = 1
@@ -1258,6 +1259,8 @@ class BattleController:
         self.unload_bullet_board()
         self.stop_enemy_attack_clock()
         self.load_bullet_board_called_for_this_turn = False
+        for card in self.battle_player_character_cards.children:
+            card.is_focusable = True
 
     def change_player_icon(self, icon_path: str = ""):
         """ Changes the icon of the current player to the icon at the given path. """

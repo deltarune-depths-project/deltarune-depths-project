@@ -84,6 +84,7 @@ class RudinnRedBuster(MultiUserAct):
         self.shine_sound = arcade.load_sound(path="assets/audio/battle/snd_boost.wav")
 
     def perform_act(self, actor, target, controller):
+        print("yes")
         super().perform_act(actor, target, controller)
 
         # Play the sound associated with the soul shining.
