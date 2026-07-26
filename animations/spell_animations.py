@@ -628,7 +628,6 @@ class RudeBusterAnimation(MultiSpriteAnimation):
             self.rude_buster_beam_textures = load_textures_at_filepath_into_texture_array(
                 folder_path=self.beam_texture_path
             )
-            print(self.beam_texture_path)
 
             self.number_of_wave_sprites = 18
             self.trajectory_arc_height = -70

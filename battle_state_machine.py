@@ -1119,7 +1119,6 @@ class BattleController:
                 self.battle_textbox.load_dialog(TextBoxDialog(act_texts))
                 """
                 self.sorted_actions_queue["simple_act_actions"].pop().execute()
-                print("yes")
                 return
             elif len(self.sorted_actions_queue["magic_spare_item_actions"]) > 0:
                 self.sorted_actions_queue["magic_spare_item_actions"].pop().execute()
