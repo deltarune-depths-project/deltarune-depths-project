@@ -15,7 +15,7 @@ class Act:
         self.time_before_player_can_advance_past_act = time_before_player_can_advance_past_act  # If provided, the amount of time player input will be delayed while the spell is being cast
         self.suppress_actions_queue_update = suppress_actions_queue_update  # If True, prevents user input from advancing the actions queue.
 
-    def perform_act(self, actor, target, dialogue_box):
+    def perform_act(self, actor, target, controller):
         """
         Executes the act. This is a stub for child classes
         :return: None
@@ -52,7 +52,7 @@ class SimpleAct(Act):
         self.tired_percentage = tired_percentage  # Tired granted to the enemy the act is performed on (between 0 and 100)
         self.actor_animation_state = actor_animation_state  # The animation the actor is briefly given when they perform the act.
 
-    def perform_act(self, actor, target, dialogue_box):
+    def perform_act(self, actor, target, controller):
         """
         Executes the act.
         :return: None
@@ -70,7 +70,7 @@ class SimpleAct(Act):
 
         # Load the act dialogue into the dialogue box, if there is any.
         if self.perform_act_text:
-            dialogue_box.load_dialog(BattleTextBoxDialog(text=self.perform_act_text, sprites_and_effects_collection=actor.sprites_and_effects_collection))
+            controller.battle_textbox.load_dialog(BattleTextBoxDialog(text=self.perform_act_text, sprites_and_effects_collection=actor.sprites_and_effects_collection))
 
         # If the mercy/tired percentages are greater than zero, have the target receive them.
         if self.mercy_percentage > 0.0:
@@ -142,11 +142,11 @@ class MultiUserAct(Act):
         self.additional_actors = additional_actors
         self.additional_actors_animation_states = additional_actors_animation_states
 
-    def perform_act(self, actor, target, dialogue_box, players):
-        super().perform_act(actor, target, dialogue_box)
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller.battle_textbox)
         additional_player_index = 0
         for additional_actor in self.additional_actors:
-            for player in players:
+            for player in controller.players:
                 if isinstance(player, additional_actor):
                     if self.additional_actors_animation_states[additional_player_index] in player.get_animations_by_state():
                         player.set_animation_state(self.additional_actors_animation_states[additional_player_index])

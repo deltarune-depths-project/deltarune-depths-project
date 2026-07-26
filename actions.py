@@ -218,7 +218,7 @@ class ActAction(Action):
         self.act.perform_act(
             actor=self.actor,
             target=self.target,
-            dialogue_box=self.controller.battle_textbox,
+            controller=self.controller,
         )
 
         if self.act.suppress_actions_queue_update:
@@ -229,6 +229,12 @@ class ActAction(Action):
     def ready_act(self):
         # Performs code meant to be executed after selecting an act.
         self.actor.set_animation_state("battle_act_ready")
+        if hasattr(self.act, "additional_actors") and len(self.act.additional_actors) > 0:
+            for actor in self.act.additional_actors:
+                for player in self.controller.players:
+                    if isinstance(player, actor):
+                        player.set_animation_state("battle_act_ready")
+
         self.controller.change_player_icon("assets/textures/gui_graphics/action_icons/act_icon.png")
 
     def cancel_act(self):
@@ -324,7 +330,7 @@ class ItemAction(Action):
 
 
 class SpareAction(Action):
-    def __init__(self, actor: player_character.PlayerCharacter, target: non_player_character.NonPlayerCharacter, controller):
+    def __init__(self, actor: player_character.PlayerCharacter, target, controller):
         super().__init__(actor=actor, controller=controller)
         self.target = target
 
