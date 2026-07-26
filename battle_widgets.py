@@ -513,7 +513,8 @@ class BattleHUDCharacterClamshell(UILayout):
         self.hud_movement_time = 0.0
         self.hud_movement_total_duration = 0.2
 
-        # Since UIImages are dumb I'm including an empty solid
+        # If False, the card will be skipped over when selecting player actions.
+        self.is_focusable = True
 
     def on_update(self, dt):
         if self.hud_moving:
@@ -538,6 +539,20 @@ class BattleHUDCharacterClamshell(UILayout):
 
         self.battle_hud_button_layout.center_x = rect.center_x
         self.battle_hud_button_layout.center_y = rect.center_y
+
+    def enable_focus(self):
+        """
+        Allows the player to focus the card while selecting player actions.
+        :return: None
+        """
+        self.is_focusable = True
+
+    def disable_focus(self):
+        """
+        Prevents the player from focusing the card while selecting player actions.
+        :return: None
+        """
+        self.is_focusable = False
 
     def move_character_hud_vertically(self, is_moving_down: bool = True):
         """

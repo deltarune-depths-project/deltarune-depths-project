@@ -235,11 +235,25 @@ class ActAction(Action):
                     if isinstance(player, actor):
                         player.set_animation_state("battle_act_ready")
 
+                for player_card in self.controller.battle_player_character_cards.children:
+                    if isinstance(player_card.player_character, actor):
+                        player_card.disable_focus()
+
         self.controller.change_player_icon("assets/textures/gui_graphics/action_icons/act_icon.png")
 
     def cancel_act(self):
         # Performs code meant to be executed after canceling an act.
         self.actor.set_animation_state("battle_idle")
+        if hasattr(self.act, "additional_actors") and len(self.act.additional_actors) > 0:
+            for actor in self.act.additional_actors:
+                for player in self.controller.players:
+                    if isinstance(player, actor):
+                        player.set_animation_state("battle_idle")
+
+                for player_card in self.controller.battle_player_character_cards.children:
+                    if isinstance(player_card.player_character, actor):
+                        player_card.enable_focus()
+
         self.controller.change_player_icon()
 
 

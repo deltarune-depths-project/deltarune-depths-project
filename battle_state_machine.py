@@ -635,7 +635,7 @@ class BattleController:
 
         while (
         not not_knocked_out_next_character_found) and self.current_player_index + next_character_index_change < self.focus_stack.get_highest_member().get_full_layout_length():
-            if self.players[self.current_player_index + next_character_index_change].hp < 0:
+            if self.players[self.current_player_index + next_character_index_change].hp < 0 or not self.battle_player_character_cards.children[self.current_player_index + next_character_index_change].is_focusable:
                 next_character_index_change += 1
             else:
                 not_knocked_out_next_character_found = True
@@ -672,7 +672,7 @@ class BattleController:
 
         while (
                 not not_knocked_out_previous_character_found) and self.current_player_index - previous_character_index_change > 0:
-            if self.players[self.current_player_index - previous_character_index_change].hp < 0:
+            if self.players[self.current_player_index - previous_character_index_change].hp < 0 or not self.battle_player_character_cards.children[self.current_player_index - previous_character_index_change].is_focusable:
                 previous_character_index_change += 1
             else:
                 not_knocked_out_previous_character_found = True
