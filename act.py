@@ -111,7 +111,7 @@ class MagicUserAct(SimpleAct):
         self.tired_percentage = tired_percentage
 
 
-class MultiUserAct(Act):
+class MultiUserAct(SimpleAct):
     """
     An act that requires multiple users to cast.
 
@@ -131,24 +131,24 @@ class MultiUserAct(Act):
         additional_actors_animation_states: list[str] = [],
     ):
         super().__init__(
-            name,
-            description,
-            perform_act_text,
-            tp_cost,
-            time_before_player_can_advance_past_act,
-            suppress_actions_queue_update
+            name=name,
+            description=description,
+            perform_act_text=perform_act_text,
+            tp_cost=tp_cost,
+            time_before_player_can_advance_past_act=time_before_player_can_advance_past_act,
+            suppress_actions_queue_update=suppress_actions_queue_update
         )
 
         self.additional_actors = additional_actors
         self.additional_actors_animation_states = additional_actors_animation_states
 
     def perform_act(self, actor, target, controller):
-        super().perform_act(actor, target, controller.battle_textbox)
+        super().perform_act(actor, target, controller)
         additional_player_index = 0
         for additional_actor in self.additional_actors:
             for player in controller.players:
                 if isinstance(player, additional_actor):
-                    if self.additional_actors_animation_states[additional_player_index] in player.get_animations_by_state():
+                    if self.additional_actors_animation_states[additional_player_index] in player.get_valid_animation_states():
                         player.set_animation_state(self.additional_actors_animation_states[additional_player_index])
                     break
 

@@ -628,7 +628,6 @@ class BattleController:
         :return:
         """
         self.actions_queue.push(action)
-        print("len of actions queue: " + str(len(self.actions_queue)))
 
         # Check if the next player character is downed. If so, skip over them.
         next_character_index_change = 1
@@ -1120,6 +1119,7 @@ class BattleController:
                 self.battle_textbox.load_dialog(TextBoxDialog(act_texts))
                 """
                 self.sorted_actions_queue["simple_act_actions"].pop().execute()
+                print("yes")
                 return
             elif len(self.sorted_actions_queue["magic_spare_item_actions"]) > 0:
                 self.sorted_actions_queue["magic_spare_item_actions"].pop().execute()

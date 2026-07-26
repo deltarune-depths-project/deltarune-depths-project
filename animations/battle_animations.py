@@ -712,7 +712,8 @@ class SoulShiningAnimation(SingleSpriteAnimation):
         new_texture_index = self.time // self.animation_framerate
         if self.current_texture_index != new_texture_index:
             self.current_texture_index = int(new_texture_index)
-            self.sprite.set_texture(self.current_texture_index)
+            if self.current_texture_index < len(self.sprite.textures):
+                self.sprite.set_texture(self.current_texture_index)
 
         if self.time > self.total_duration:
             self.terminate_animation()

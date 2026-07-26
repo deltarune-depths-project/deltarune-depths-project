@@ -84,7 +84,6 @@ class RudinnRedBuster(MultiUserAct):
         self.shine_sound = arcade.load_sound(path="assets/audio/battle/snd_boost.wav")
 
     def perform_act(self, actor, target, controller):
-        print("yes")
         super().perform_act(actor, target, controller)
 
         # Play the sound associated with the soul shining.
@@ -101,10 +100,17 @@ class RudinnRedBuster(MultiUserAct):
             0.5
         )
 
+
+        spell_caster = None
+        for player in controller.players:
+            if isinstance(player, self.additional_actors[0]):
+                spell_caster = player
+                break
+
         # Add a SpellAction to the beginning of the actions queue.
-        controller.sorted_actions_queue.append(
+        controller.sorted_actions_queue["simple_act_actions"].insert(0,
             SpellAction(
-                actor=self.additional_actors[0],
+                actor=spell_caster,
                 targets=[target],
                 spell=RedBuster(),
                 controller=controller

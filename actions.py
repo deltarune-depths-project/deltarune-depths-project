@@ -104,7 +104,7 @@ class ActionsQueue:
         for action in self.actions:
             if not action.is_immediate:
                 if type(action) == ActAction:
-                    if issubclass(type(action.act), SimpleAct):
+                    if issubclass(type(action.act), Act):
                         simple_act_actions.insert(0, action)
                     #elif type(action.act) == ComplexAct:
                     #    complex_act_actions.insert(0, action)
