@@ -5,7 +5,7 @@ import arcade
 import pyglet.clock
 from PIL import Image, ImageChops
 from PIL.Image import Resampling
-from arcade import LBWH, Rect, SpriteSolidColor
+from arcade import LBWH, Rect, SpriteSolidColor, Texture
 from arcade.gui import UITextureButton, UIBoxLayout, UIWidget, UILabel, UIImage, bind, Property, UIGridLayout, \
     UIKeyPressEvent, UIKeyEvent, Surface, UIAnchorLayout
 from arcade.gui.widgets import FocusMode, UISpace, UILayout
@@ -1809,16 +1809,49 @@ class PlayerSelect(UIBoxLayout):
         super().do_layout()
 
 
-class ActListOption(UILabel):
+class ActListOptionIcon(UIImage):
+    def __init__(self, icon_texture: Texture):
+        super().__init__(
+            texture=icon_texture,
+            width=64,
+            height=48
+        )
+
+
+class ActListOptionName(UILabel):
     def __init__(self, act: Act, color: Color = arcade.color.WHITE):
         super().__init__(
-            text="     " + act.name,
-            width=400,
+            text=act.name,
+            #width=400,
             height=64,
             font_name="8bitoperator JVE",
             font_size=48,
             text_color=color,
-            size_hint=None
+            #size_hint=None
+        )
+
+        self.act = act
+        self.focus_mode = FocusMode(2)
+        self.soul_sprite = arcade.Sprite(path_or_texture="assets/sprites/soul/soul.png", scale=1.0)
+
+
+class ActListOption(UIBoxLayout):
+    def __init__(self, act: Act, color: Color = arcade.color.WHITE):
+        children = [UISpace(width=48, height=64)]
+
+        if hasattr(act, "additional_actors"):
+            for actor in act.additional_actors:
+                children.append(ActListOptionIcon(icon_texture=actor().normal_icon_texture))
+
+        children.append(ActListOptionName(act, color))
+
+        super().__init__(
+            width=400,
+            height=64,
+            vertical=False,
+            #size_hint=None,
+            children=children,
+            space_between=1
         )
 
         self.act = act
@@ -1871,7 +1904,7 @@ class ActList(UIGridLayout):
                 row_index = act_index // 2
                 col_index = act_index % 2
                 self.add(
-                    ActListOption(act),
+                    ActListOption(act=act, color=color),
                     column=col_index,
                     row=row_index
                 )
@@ -1883,7 +1916,7 @@ class ActDescriptionLabel(UILabel):
         super().__init__(
             size_hint=(None, None),
             width=400,
-            height=212,
+            height=138,
             font_name="8bitoperator JVE",
             font_size=48,
             text_color=arcade.color.GRAY,
@@ -1908,12 +1941,13 @@ class ActDescriptionAndTPCost(UIBoxLayout):
     def __init__(self, act: Act = None):
         super().__init__(
             width=400,
-            height=300,
+            height=204,
             children=[
                 ActDescriptionLabel("" if not act or not act.description else act.description),
                 ActTPCostLabel(0 if not act or not act.tp_cost else act.tp_cost)
             ],
-            align="left"
+            align="left",
+            size_hint=None
         )
 
     def update_act_data(self, act: Act = None):

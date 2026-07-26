@@ -1438,20 +1438,21 @@ class SelectCommand(Command):
 
             case BattleState.PLAYER_ACT_SELECT:
                 selected_act = self.controller.focus_stack.get_highest_member().get_focused_widget().act
-                self.controller.focus_stack.pop(remove_widget=True)
-                selected_target_enemy = self.controller.focus_stack.get_highest_member().get_focused_widget().enemy
-                selected_target_enemy.unfocus()
-                self.controller.focus_stack.pop(remove_widget=True)
-                current_player_character = self.controller.focus_stack.get_highest_member().get_interactive_ui_layout().player_character
+                if self.controller.tp_meter.get_tp_in_meter() >= selected_act.tp_cost:
+                    self.controller.focus_stack.pop(remove_widget=True)
+                    selected_target_enemy = self.controller.focus_stack.get_highest_member().get_focused_widget().enemy
+                    selected_target_enemy.unfocus()
+                    self.controller.focus_stack.pop(remove_widget=True)
+                    current_player_character = self.controller.focus_stack.get_highest_member().get_interactive_ui_layout().player_character
 
-                act_action = ActAction(
-                    actor=current_player_character,
-                    target=selected_target_enemy,
-                    act=selected_act,
-                    controller=self.controller
-                )
+                    act_action = ActAction(
+                        actor=current_player_character,
+                        target=selected_target_enemy,
+                        act=selected_act,
+                        controller=self.controller
+                    )
 
-                self.controller.move_to_next_player_card(act_action)
+                    self.controller.move_to_next_player_card(act_action)
                 return
 
             case BattleState.PLAYER_MAGIC_SELECT:
