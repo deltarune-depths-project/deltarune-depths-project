@@ -6,7 +6,7 @@ from actions import SpellAction
 from animations.battle_animations import SoulShiningAnimation
 #from player_characters import Susie
 from speech_bubble import SpeechBubbleDialog
-from spells import RedBuster, HealPrayer
+from spells import RedBuster, HealPrayer, DualHeal
 
 
 # SimpleActs
@@ -157,14 +157,12 @@ class RudinnDualHeal(MultiUserAct):
                 break
 
         # Add a SpellAction to the beginning of the actions queue.
-        spell = HealPrayer()
-        spell.name = "Dual Heal"
 
         controller.sorted_actions_queue["simple_act_actions"].insert(0,
             SpellAction(
                 actor=spell_caster,
                 targets=controller.players,
-                spell=spell,
+                spell=DualHeal(),
                 controller=controller
             )
         )
