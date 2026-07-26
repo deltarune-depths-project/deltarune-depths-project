@@ -172,7 +172,7 @@ class GameView(arcade.View):
 
         self._animation_states = self.player_one.get_valid_animation_states()
 
-        """
+
         self.player_two = player_characters.Susie()
         self.player_two.set_sprites_and_effects_collection(self.sprites_and_effects_collection)
         self.player_two.center_x = self._holy_arc[1][0]
@@ -182,7 +182,7 @@ class GameView(arcade.View):
         self.player_two.equip_armor_to_slot_1(ShadowMantle())
         self.player_two.equip_armor_to_slot_2(Jevilstail())
         self.player_characters.append(self.player_two)
-        """
+
 
 
         self.player_four = player_characters.Noelle()
