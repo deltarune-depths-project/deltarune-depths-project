@@ -6,7 +6,7 @@ from arcade.types import Color
 import character
 import default_data
 import graphics_objects
-from acts import RudinnConvince, RudinnLecture
+from acts import RudinnConvince, RudinnLecture, RudinnRedBuster
 from animations.battle_animations import EnemyFleeingAnimation, StrikeEnemyAnimation, NumberBounceAnimation
 from animations.common_animations import ShakeAnimation
 from enemy_attacks import RainingDiamondAttack
@@ -291,8 +291,8 @@ class Rudinn(NonPlayerCharacter):
             angle=angle,
             sprite_folder_name="rudinn",
             name="Rudinn",
-            hp=900,
-            max_hp=900,
+            hp=90,
+            max_hp=90,
             attack=10,
             defense=2,
             dark_dollars_given_on_defeat=30,
@@ -306,6 +306,7 @@ class Rudinn(NonPlayerCharacter):
                 )
             ],
             acts=[
+                RudinnRedBuster(),
                 RudinnConvince(),
                 RudinnLecture(enemies_list)
             ],

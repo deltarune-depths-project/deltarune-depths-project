@@ -1,5 +1,12 @@
-from act import SimpleAct, MagicUserAct
+import arcade
+import pyglet.clock
+
+from act import SimpleAct, MagicUserAct, MultiUserAct
+from actions import SpellAction
+from animations.battle_animations import SoulShiningAnimation
+#from player_characters import Susie
 from speech_bubble import SpeechBubbleDialog
+from spells import RedBuster
 
 
 # SimpleActs
@@ -26,8 +33,8 @@ class RudinnConvince(SimpleAct):
             mercy_percentage=100
         )
 
-    def perform_act(self, actor, target, dialogue_box):
-        super().perform_act(actor, target, dialogue_box)
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller)
         target.assign_speech_bubble_dialog_this_turn(
             SpeechBubbleDialog(
                 text="Yeah that\nmakes sense.",
@@ -48,8 +55,8 @@ class RudinnLecture(SimpleAct):
 
         self.enemies_list = enemies_list
 
-    def perform_act(self, actor, target, dialogue_box):
-        super().perform_act(actor, target, dialogue_box)
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller)
         for enemy in self.enemies_list:
             enemy.receive_tired(100.0)
             enemy.assign_speech_bubble_dialog_this_turn(
@@ -62,8 +69,57 @@ class RudinnLecture(SimpleAct):
             )
 
 
-# Magic user acts
+class RudinnRedBuster(MultiUserAct):
+    def __init__(self):
+        from player_characters import Susie
+        super().__init__(
+            name="Red Buster",
+            perform_act_text="Your SOUL shined its power on Susie!",
+            description="Red Damage",
+            tp_cost=60,
+            additional_actors=[Susie()],
+            additional_actors_animation_states=["battle_magic_ready"]
+        )
 
+        self.shine_sound = arcade.load_sound(path="assets/audio/battle/snd_boost.wav")
+
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller)
+
+        # Play the sound associated with the soul shining.
+        pyglet.clock.schedule_once(lambda dt: self.shine_sound.play(), 0.5)
+
+        # Play the soul shining animation.
+        soul_shining_animation = SoulShiningAnimation(actor)
+        pyglet.clock.schedule_once(
+            lambda dt: controller.sprites_and_effects_collection.effects.append(soul_shining_animation),
+            0.4
+        )
+        pyglet.clock.schedule_once(
+            lambda dt: controller.sprites_and_effects_collection.effects_sprites.append(soul_shining_animation.sprite),
+            0.4
+        )
+
+
+        spell_caster = None
+        for player in controller.players:
+            if isinstance(player, type(self.additional_actors[0])):
+                spell_caster = player
+                break
+
+        # Add a SpellAction to the beginning of the actions queue.
+        controller.sorted_actions_queue["simple_act_actions"].insert(0,
+            SpellAction(
+                actor=spell_caster,
+                targets=[target],
+                spell=RedBuster(),
+                controller=controller
+            )
+        )
+
+
+
+# Magic user acts
 class NoelleRudinnAction1(MagicUserAct):
     def __init__(self, player):
         from non_player_character import Rudinn  # TODO: fix this
@@ -76,8 +132,8 @@ class NoelleRudinnAction1(MagicUserAct):
             mercy_percentage=50
         )
 
-    def perform_act(self, actor, target, dialogue_box):
-        super().perform_act(actor, target, dialogue_box)
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller)
         target.assign_speech_bubble_dialog_this_turn(
             SpeechBubbleDialog(
                 text="That's what the\nKnight did to my\ncousin Phil",
@@ -99,8 +155,8 @@ class RalseiRudinnAction1(MagicUserAct):
             mercy_percentage=50
         )
 
-    def perform_act(self, actor, target, dialogue_box):
-        super().perform_act(actor, target, dialogue_box)
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller)
         target.assign_speech_bubble_dialog_this_turn(
             SpeechBubbleDialog(
                 text="My last house\nwasn't a full\none, but...",
@@ -122,8 +178,8 @@ class SusieRudinnAction1(MagicUserAct):
             mercy_percentage=30
         )
 
-    def perform_act(self, actor, target, dialogue_box):
-        super().perform_act(actor, target, dialogue_box)
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller)
         target.assign_speech_bubble_dialog_this_turn(
             SpeechBubbleDialog(
                 text="Oh yeah, never\nheard that one\nbefore...",

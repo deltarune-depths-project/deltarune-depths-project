@@ -3,7 +3,7 @@ from arcade.types import Color
 import graphics_objects
 from acts import RalseiRudinnAction1, NoelleRudinnAction1, SusieRudinnAction1
 from player_character import PlayerCharacter
-from spells import IceShock, Spell, FireShock, HealPrayer, RudeBuster, SleepMist
+from spells import IceShock, Spell, FireShock, HealPrayer, RudeBuster, SleepMist, RedBuster
 
 
 class Kris(PlayerCharacter):
@@ -37,7 +37,7 @@ class Susie(PlayerCharacter):
             battle_ui_icon_color=Color(234, 121, 200, 255),
             fight_box_color=Color(128, 0, 128, 255),
             fight_crit_box_color=Color(234, 121, 200, 255),
-            spells=[RudeBuster()]
+            spells=[RudeBuster(), RedBuster()]
         )
 
         self.magic_user_acts = [SusieRudinnAction1(self)]
