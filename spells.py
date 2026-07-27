@@ -334,7 +334,7 @@ class DualHeal(Spell):
     def __init__(self):
         super().__init__(
             name="Dual Heal",
-            description="Heal Ally",
+            description="Heals everyone",
             tp_cost=50,
             base_health_change=0,
             is_friendly_spell=True,
