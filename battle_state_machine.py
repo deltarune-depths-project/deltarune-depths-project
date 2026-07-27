@@ -1442,18 +1442,21 @@ class SelectCommand(Command):
             case BattleState.PLAYER_ACT_SELECT:
                 selected_act = self.controller.focus_stack.get_highest_member().get_focused_widget().act
                 all_actors_found = True
+                all_actors_arent_downed = True
                 if hasattr(selected_act, "additional_actors"):
                     for actor in selected_act.additional_actors:
                         actor_found = False
                         for player in self.controller.players:
                             if isinstance(player, type(actor)):
                                 actor_found = True
+                                if player.hp <= 0:
+                                    all_actors_arent_downed = False
                                 break
                         if not actor_found:
                             all_actors_found = False
                             break
 
-                if self.controller.tp_meter.get_tp_in_meter() >= selected_act.tp_cost and all_actors_found:
+                if self.controller.tp_meter.get_tp_in_meter() >= selected_act.tp_cost and all_actors_found and all_actors_arent_downed:
                     self.controller.focus_stack.pop(remove_widget=True)
                     selected_target_enemy = self.controller.focus_stack.get_highest_member().get_focused_widget().enemy
                     selected_target_enemy.unfocus()
