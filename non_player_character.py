@@ -376,7 +376,7 @@ class FRIEND(NonPlayerCharacter):
             max_hp=6666,
             attack=66,
             defense=66,
-            dark_dollars_given_on_defeat=0,
+            dark_dollars_given_on_defeat=-666,
             element_id=6,
             attacks=[
                 RainingDiamondAttack(
@@ -407,7 +407,7 @@ class FRIEND(NonPlayerCharacter):
         self.battle_description = ("FRIEND - ATK: " + str(self.attack) + " DEF: " + str(self.defense) +
                                    "\nYou can't tell how many cats this  counts as.")
 
-        self.animations_by_state["battle_idle"].set_frame_duration(0.3)
+        self.animations_by_state["battle_idle"].set_frame_duration(0.25)
 
 
     def execute_attack(self, enemies: list[NonPlayerCharacter]):

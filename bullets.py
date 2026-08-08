@@ -9,7 +9,8 @@ import settings
 class Bullet(Sprite):
     def __init__(self, path_or_texture: Texture | str, center_x: float = 0.0, center_y: float = 0.0, angle: float = 0.0,
                  scale: float = 1.0, lifetime: float = 10.0, kill_bullet_when_offscreen: bool = True,
-                 base_damage: float = 50.0 ,tp_gain = 0.5, element_id: int = 0, targets_multiple_players: bool = False):
+                 base_damage: float = 50.0 ,tp_gain = 0.5, element_id: int = 0, targets_multiple_players: bool = False,
+                 attacker = None):
         super().__init__(
             path_or_texture=path_or_texture,
             center_x=center_x,
@@ -22,6 +23,10 @@ class Bullet(Sprite):
         self.lifetime = lifetime
         self.kill_bullet_when_offscreen = kill_bullet_when_offscreen
         self.base_damage = base_damage # The base damage that the bullet should deal to its target.
+        if attacker is not None:
+            self.damage = self.base_damage + (attacker.attack * 3)
+        else:
+            self.damage = self.base_damage
         self.tp_gain_when_grazed = tp_gain  # The amount of TP gained when the soul grazes the bullet
         self.has_been_grazed = False  # Whether the bullet has been grazed yet
         self.element_id = element_id # The element ID of the bullet. Defaults to 0
@@ -48,13 +53,15 @@ class BlackDiamondBullet(Bullet):
     """
     The black diamond bullet. Used a lot in Chapter 1, primarily by Rudinns but also by enemies like Jevil.
     """
-    def __init__(self, center_x: float = 0.0, center_y: float = 0.0, angle: float = 0.0, scale: float = 2.0):
+    def __init__(self, center_x: float = 0.0, center_y: float = 0.0, angle: float = 0.0, scale: float = 2.0,
+                 attacker = None):
         super().__init__(
             path_or_texture="assets/sprites/bullets/rudinn_diamond.png",
             center_x=center_x,
             center_y=center_y,
             angle=angle,
-            scale=scale
+            scale=scale,
+            attacker=attacker
         )
 
         self.initial_center_x = center_x
