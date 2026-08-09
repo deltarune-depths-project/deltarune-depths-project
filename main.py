@@ -235,7 +235,7 @@ class GameView(arcade.View):
 
         self.enemy_two = non_player_character.FRIEND(
             sprites_and_effects_collection=self.sprites_and_effects_collection,
-            center_x=self._unholy_arc[1][0],
+            center_x=self._unholy_arc[1][0] - 50,
             center_y=self._unholy_arc[1][1],
             enemies_list=self.enemies,
             bullet_board=self.bullet_board

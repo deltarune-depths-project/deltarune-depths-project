@@ -122,6 +122,9 @@ class NonPlayerCharacter(character.Character):
         if len(self.enemies_list) == 0:
             return
 
+        # Transform the amount of damage dealt based on defense
+        damage_dealt = int(max(1.0, damage_dealt / self.defense))
+
         target = self
         if self not in self.enemies_list:
             target = self.enemies_list[0]
@@ -395,13 +398,57 @@ class FRIEND(NonPlayerCharacter):
             enemies_list=enemies_list,
             random_speech_bubble_dialogue=[
                 SpeechBubbleDialog(
-                    text="MEOW",
-                    row_count=1,
-                    column_count=4,
+                    text="A BAGFUL OF\nWHITE COTTON",
+                    row_count=2,
+                    column_count=12,
+                    actor=self
+                ),
+                SpeechBubbleDialog(
+                    text="ONE THICK\nSEWING NEEDLE",
+                    row_count=2,
+                    column_count=13,
+                    actor=self
+                ),
+                SpeechBubbleDialog(
+                    text="LOTS AND\nLOTS OF\nLITTLE PINS",
+                    row_count=3,
+                    column_count=11,
+                    actor=self
+                ),
+                SpeechBubbleDialog(
+                    text="A TOMATO MADE\nOF CLOTH",
+                    row_count=2,
+                    column_count=13,
+                    actor=self
+                ),
+                SpeechBubbleDialog(
+                    text="TWO YARDS\nOF LEATHER",
+                    row_count=2,
+                    column_count=10,
+                    actor=self
+                ),
+                SpeechBubbleDialog(
+                    text="A PAIR OF\nRUSTY SCISSORS",
+                    row_count=2,
+                    column_count=14,
+                    actor=self
+                ),
+                SpeechBubbleDialog(
+                    text="A PAIR OF\nBIG BEAUTIFUL\nBUTTONS",
+                    row_count=3,
+                    column_count=13,
+                    actor=self
+                ),
+                SpeechBubbleDialog(
+                    text="A SMALL\nWOODEN TABLE",
+                    row_count=2,
+                    column_count=12,
                     actor=self
                 ),
             ]
         )
+
+        self.speech_bubble_sound = arcade.load_sound("assets/audio/battle/non_player_character/FRIEND/loquatious_cat.mp3")
 
         self.bullet_board = bullet_board
         self.battle_description = ("FRIEND - ATK: " + str(self.attack) + " DEF: " + str(self.defense) +
@@ -409,6 +456,9 @@ class FRIEND(NonPlayerCharacter):
 
         self.animations_by_state["battle_idle"].set_frame_duration(0.25)
 
+    def spawn_speech_bubble_this_turn(self):
+        self.speech_bubble_sound.play()
+        return super().spawn_speech_bubble_this_turn()
 
     def execute_attack(self, enemies: list[NonPlayerCharacter]):
         """
