@@ -6,9 +6,11 @@ from sprites_and_effects_collection import SpritesAndEffectsCollection
 
 
 class BulletPattern:
-    def __init__(self, sprites_and_effects_collection: SpritesAndEffectsCollection, total_duration: float = 10.0):
+    def __init__(self, sprites_and_effects_collection: SpritesAndEffectsCollection, total_duration: float = 10.0,
+                 attacker = None):
         self.sprites_and_effects_collection = sprites_and_effects_collection
         self.total_duration = total_duration
+        self.attacker = attacker
 
         self.time = 0
         self.bullets_sprite_list = [] # When spawning a bullet, add it to this list so it can be cleaned up later
@@ -51,8 +53,12 @@ class BulletPattern:
 
 class RainingDiamondBulletPattern(BulletPattern):
     def __init__(self, sprites_and_effects_collection, bullet_board: BulletBoard, total_duration: float = 20.0,
-                 frequency: float = 1.0):
-        super().__init__(sprites_and_effects_collection, total_duration)
+                 frequency: float = 1.0, attacker = None):
+        super().__init__(
+            sprites_and_effects_collection=sprites_and_effects_collection,
+            total_duration=total_duration,
+            attacker=attacker
+        )
 
         self.bullet_board = bullet_board
         self.time_since_last_diamond_spawned = 0.0
@@ -65,7 +71,8 @@ class RainingDiamondBulletPattern(BulletPattern):
         if self.time_since_last_diamond_spawned > self.diamond_frequency:
             bullet = BlackDiamondBullet(
                 center_x=random.randint(self.bullet_board.bullet_board_sprite.left, self.bullet_board.bullet_board_sprite.right),
-                center_y=self.bullet_board.bullet_board_sprite.top + 20
+                center_y=self.bullet_board.bullet_board_sprite.top + 20,
+                attacker=self.attacker
             )
             self.spawn_bullet(bullet)
 

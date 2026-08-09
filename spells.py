@@ -128,7 +128,7 @@ class Spell:
             elif self.is_friendly_spell:
                 target.modify_hp(self.spell_healing_function(self.caster))
             else:
-                damage_dealt = self.spell_damage_function(self.caster, target)
+                damage_dealt = int(self.spell_damage_function(self.caster, target))
                 if self.element_id:
                     for element in default_data.ELEMENTAL_PAIRS:
                         if element.element_id == self.element_id:
@@ -289,7 +289,7 @@ class FireShock(Spell):
         :return: None
         """
 
-        return (max(caster.magic - 10, 1) * 30) + 90 + random.randint(1, 10)
+        return (max(caster.magic - 10, 1) * 30) + 90 + random.randint(1, 10) / (target.defense / 16)
 
     def affect_targets_with_spell(self):
         super().affect_targets_with_spell()
@@ -393,7 +393,7 @@ class RudeBuster(Spell):
             confirm_damage = self.damage_addition_amount_list[self.frames_between_confirm_and_impact]
         else:
             confirm_damage = 0
-        return (caster.get_total_attack() * 11) + (caster.get_total_magic() * 5) - (target.defense * 3) + confirm_damage
+        return int(((caster.get_total_attack() * 11) + (caster.get_total_magic() * 5) - (target.defense * 3) + confirm_damage) / (target.defense / 16))
 
     def cast_spell(self, caster, targets, controller):
         """
@@ -459,7 +459,7 @@ class RedBuster(RudeBuster):
             confirm_damage = self.damage_addition_amount_list[self.frames_between_confirm_and_impact]
         else:
             confirm_damage = 0
-        return (caster.get_total_attack() * 13) + (caster.get_total_magic() * 6) - (target.defense * 6) + confirm_damage + 90
+        return int(((caster.get_total_attack() * 13) + (caster.get_total_magic() * 6) - (target.defense * 6) + confirm_damage + 90) / (target.defense / 16))
 
 
 class SleepMist(Spell):

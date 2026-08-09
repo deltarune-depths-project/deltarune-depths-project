@@ -222,6 +222,7 @@ class GameView(arcade.View):
 
 
         # Create and append the enemies to the SpriteList.
+        """
         self.enemy_one = non_player_character.Rudinn(
             sprites_and_effects_collection=self.sprites_and_effects_collection,
             center_x=self._unholy_arc[0][0],
@@ -230,16 +231,18 @@ class GameView(arcade.View):
             bullet_board=self.bullet_board
         )
         self.enemies.append(self.enemy_one)
+        """
 
-        self.enemy_two = non_player_character.Rudinn(
+        self.enemy_two = non_player_character.FRIEND(
             sprites_and_effects_collection=self.sprites_and_effects_collection,
-            center_x=self._unholy_arc[1][0],
+            center_x=self._unholy_arc[1][0] - 50,
             center_y=self._unholy_arc[1][1],
             enemies_list=self.enemies,
             bullet_board=self.bullet_board
         )
         self.enemies.append(self.enemy_two)
 
+        """
         self.enemy_three = non_player_character.Rudinn(
             sprites_and_effects_collection=self.sprites_and_effects_collection,
             center_x=self._unholy_arc[2][0],
@@ -248,6 +251,7 @@ class GameView(arcade.View):
             bullet_board=self.bullet_board
         )
         self.enemies.append(self.enemy_three)
+        """
 
         # for enemy in self.enemies:
         #    enemy.spawn_speech_bubble(enemy.random_speech_bubble_dialogue[0])

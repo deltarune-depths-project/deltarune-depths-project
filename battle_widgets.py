@@ -762,6 +762,7 @@ class SpellList(UIGridLayout):
             int((character.battle_ui_color.b + 255) / 2),
             int(character.battle_ui_color.a)
         ])
+        spell_index = 0
 
         if character.spells or (character.knows_magic and len(character.magic_user_acts) > 0):
             for magic_user_act in character.magic_user_acts:
@@ -775,9 +776,8 @@ class SpellList(UIGridLayout):
                             column=0,
                             row=0
                         )
+                        spell_index = 1
                         break
-
-            spell_index = 1
             for spell in character.spells:
                 if controller.tp_meter.get_tp_in_meter() >= spell.tp_cost:
                     color = arcade.color.WHITE

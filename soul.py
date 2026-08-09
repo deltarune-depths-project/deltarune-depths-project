@@ -216,7 +216,7 @@ class Soul(arcade.Sprite):
                         players_not_knocked.append(player)
                 if len(players_not_knocked) > 0:
                     if colliding_bullet.targets_multiple_players:
-                        base_damage_to_each_player = colliding_bullet.base_damage / 3
+                        base_damage_to_each_player = colliding_bullet.damage / 3
                         for player in players_not_knocked:
                             player.receive_damage(
                                 damage_dealt=base_damage_to_each_player,
@@ -227,7 +227,7 @@ class Soul(arcade.Sprite):
                     else:
                         player_to_be_damaged = players_not_knocked[random.randint(0, len(players_not_knocked) - 1)]
                         player_to_be_damaged.receive_damage(
-                            damage_dealt=colliding_bullet.base_damage,
+                            damage_dealt=colliding_bullet.damage,
                             element_id=colliding_bullet.element_id,
                             controller=self.controller
                         )
