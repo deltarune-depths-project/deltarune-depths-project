@@ -184,16 +184,6 @@ class GameView(arcade.View):
         self.player_characters.append(self.player_two)
 
 
-        self.player_three = player_characters.Ralsei()
-        self.player_three.set_sprites_and_effects_collection(self.sprites_and_effects_collection)
-        self.player_three.center_x = self._holy_arc[2][0]
-        self.player_three.center_y = self._holy_arc[2][1]
-
-        self.player_three.equip_weapon(ScarfMark())
-        self.player_three.equip_armor_to_slot_1(MysticBand())
-        self.player_three.equip_armor_to_slot_2(WaferGuard())
-        self.player_characters.append(self.player_three)
-
         """
         self.player_four = player_characters.Noelle()
         self.player_four.set_sprites_and_effects_collection(self.sprites_and_effects_collection)
@@ -207,11 +197,12 @@ class GameView(arcade.View):
 
         self.player_four.get_valid_animation_states()
         """
+
         """
         self.player_five = player_characters.December()
         self.player_five.set_sprites_and_effects_collection(self.sprites_and_effects_collection)
-        self.player_five.center_x = self._holy_arc[1][0]
-        self.player_five.center_y = self._holy_arc[1][1]
+        self.player_five.center_x = self._holy_arc[2][0]
+        self.player_five.center_y = self._holy_arc[2][1]
 
         self.player_five.equip_weapon(PlanetBuster())
         self.player_five.equip_armor_to_slot_1(SolArmor())
@@ -219,7 +210,19 @@ class GameView(arcade.View):
         self.player_characters.append(self.player_five)
         """
 
+        self.player_three = player_characters.Ralsei()
+        self.player_three.set_sprites_and_effects_collection(self.sprites_and_effects_collection)
+        self.player_three.center_x = self._holy_arc[2][0]
+        self.player_three.center_y = self._holy_arc[2][1]
+
+        self.player_three.equip_weapon(ScarfMark())
+        self.player_three.equip_armor_to_slot_1(MysticBand())
+        self.player_three.equip_armor_to_slot_2(WaferGuard())
+        self.player_characters.append(self.player_three)
+
+
         # Create and append the enemies to the SpriteList.
+        """
         self.enemy_one = non_player_character.Rudinn(
             sprites_and_effects_collection=self.sprites_and_effects_collection,
             center_x=self._unholy_arc[0][0],
@@ -228,16 +231,18 @@ class GameView(arcade.View):
             bullet_board=self.bullet_board
         )
         self.enemies.append(self.enemy_one)
+        """
 
-        self.enemy_two = non_player_character.Rudinn(
+        self.enemy_two = non_player_character.FRIEND(
             sprites_and_effects_collection=self.sprites_and_effects_collection,
-            center_x=self._unholy_arc[1][0],
+            center_x=self._unholy_arc[1][0] - 50,
             center_y=self._unholy_arc[1][1],
             enemies_list=self.enemies,
             bullet_board=self.bullet_board
         )
         self.enemies.append(self.enemy_two)
 
+        """
         self.enemy_three = non_player_character.Rudinn(
             sprites_and_effects_collection=self.sprites_and_effects_collection,
             center_x=self._unholy_arc[2][0],
@@ -246,6 +251,7 @@ class GameView(arcade.View):
             bullet_board=self.bullet_board
         )
         self.enemies.append(self.enemy_three)
+        """
 
         # for enemy in self.enemies:
         #    enemy.spawn_speech_bubble(enemy.random_speech_bubble_dialogue[0])
@@ -332,8 +338,6 @@ def main():
 
     # Show GameView on screen
     window.show_view(game)
-
-    print(arcade.__version__)
 
     # Start the arcade game loop
     arcade.run()

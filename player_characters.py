@@ -3,7 +3,7 @@ from arcade.types import Color
 import graphics_objects
 from acts import RalseiRudinnAction1, NoelleRudinnAction1, SusieRudinnAction1
 from player_character import PlayerCharacter
-from spells import IceShock, Spell, FireShock, HealPrayer, RudeBuster, SleepMist
+from spells import IceShock, Spell, FireShock, HealPrayer, RudeBuster, SleepMist, RedBuster
 
 
 class Kris(PlayerCharacter):
@@ -11,8 +11,8 @@ class Kris(PlayerCharacter):
         super().__init__(
             sprite_folder_name="kris",
             name="Kris",
-            max_hp=90,
-            attack=10,
+            max_hp=280,
+            attack=19,
             defense=2,
             magic=0,
             battle_ui_color=Color(0, 255, 255, 255),
@@ -29,15 +29,15 @@ class Susie(PlayerCharacter):
         super().__init__(
             sprite_folder_name="susie",
             name="Susie",
-            max_hp=110,
-            attack=14,
+            max_hp=320,
+            attack=24,
             defense=2,
-            magic=1,
+            magic=8,
             battle_ui_color=Color(255, 0, 255, 255),
             battle_ui_icon_color=Color(234, 121, 200, 255),
             fight_box_color=Color(128, 0, 128, 255),
             fight_crit_box_color=Color(234, 121, 200, 255),
-            spells=[RudeBuster()]
+            spells=[RudeBuster(), RedBuster()]
         )
 
         self.magic_user_acts = [SusieRudinnAction1(self)]
@@ -48,10 +48,10 @@ class Ralsei(PlayerCharacter):
         super().__init__(
             sprite_folder_name="ralsei",
             name="Ralsei",
-            max_hp=70,
-            attack=8,
+            max_hp=240,
+            attack=16,
             defense=2,
-            magic=7,
+            magic=16,
             battle_ui_color=Color(0, 255, 0, 255),
             battle_ui_icon_color=Color(181, 230, 29, 255),
             fight_box_color=Color(0, 255, 0, 255),
@@ -97,9 +97,9 @@ class Noelle(PlayerCharacter):
             sprite_folder_name="noelle",
             name="Noelle",
             max_hp=90,
-            attack=3,
+            attack=5,
             defense=1,
-            magic=11,
+            magic=20,
             battle_ui_color=Color(255, 255, 0, 255),
             battle_ui_icon_color=Color(255, 255, 0, 255),
             fight_box_color=Color(255, 255, 0, 255),

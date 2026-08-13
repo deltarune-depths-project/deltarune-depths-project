@@ -104,7 +104,7 @@ class ActionsQueue:
         for action in self.actions:
             if not action.is_immediate:
                 if type(action) == ActAction:
-                    if issubclass(type(action.act), SimpleAct):
+                    if issubclass(type(action.act), Act):
                         simple_act_actions.insert(0, action)
                     #elif type(action.act) == ComplexAct:
                     #    complex_act_actions.insert(0, action)
@@ -218,20 +218,48 @@ class ActAction(Action):
         self.act.perform_act(
             actor=self.actor,
             target=self.target,
-            dialogue_box=self.controller.battle_textbox,
+            controller=self.controller,
         )
-        if self.act.time_before_player_can_advance_past_act > 0.0:
-            self.controller.delay_player_from_advancing_to_next_state(self.act.time_before_player_can_advance_past_act)
+
+        if self.act.suppress_actions_queue_update:
+            self.controller.disable_executing_queued_player_actions()
+        elif self.act.time_before_player_can_advance_past_act > 0.0:
+            self.controller.delay_player_from_advancing_to_next_act(self.act.time_before_player_can_advance_past_act)
 
     def ready_act(self):
         # Performs code meant to be executed after selecting an act.
         self.actor.set_animation_state("battle_act_ready")
+
+        # If the act is a multi-user act
+        if hasattr(self.act, "additional_actors") and len(self.act.additional_actors) > 0:
+            for actor in self.act.additional_actors:
+                for player in self.controller.players:
+                    if isinstance(player, type(actor)):
+                        player.set_animation_state("battle_act_ready")
+
+                for player_card in self.controller.battle_player_character_cards.children:
+                    if isinstance(player_card.player_character, type(actor)):
+                        player_card.disable_focus()
+
         self.controller.change_player_icon("assets/textures/gui_graphics/action_icons/act_icon.png")
 
     def cancel_act(self):
         # Performs code meant to be executed after canceling an act.
         self.actor.set_animation_state("battle_idle")
+
+        # If the act is a multi-user act
+        if hasattr(self.act, "additional_actors") and len(self.act.additional_actors) > 0:
+            for actor in self.act.additional_actors:
+                for player in self.controller.players:
+                    if isinstance(player, type(actor)):
+                        player.set_animation_state("battle_idle")
+
+                for player_card in self.controller.battle_player_character_cards.children:
+                    if isinstance(player_card.player_character, type(actor)):
+                        player_card.enable_focus()
+
         self.controller.change_player_icon()
+        self.controller.add_tp_to_meter(self.act.tp_cost)
 
 
 """
@@ -281,7 +309,7 @@ class ItemAction(Action):
             lambda dt: self.controller.use_consumable_item_on_targets(self.item, self.actor, self.targets), 0.5)
         if hasattr(self.item, "time_before_player_can_advance_past_item"):
             if self.item.time_before_player_can_advance_past_item > 0.0:
-                self.controller.delay_player_from_advancing_to_next_state(
+                self.controller.delay_player_from_advancing_to_next_act(
                     self.item.time_before_player_can_advance_past_item)
 
     def ready_act(self):
@@ -321,7 +349,7 @@ class ItemAction(Action):
 
 
 class SpareAction(Action):
-    def __init__(self, actor: player_character.PlayerCharacter, target: non_player_character.NonPlayerCharacter, controller):
+    def __init__(self, actor: player_character.PlayerCharacter, target, controller):
         super().__init__(actor=actor, controller=controller)
         self.target = target
 
@@ -339,7 +367,7 @@ class SpareAction(Action):
         super().execute()
 
         # Prevents the user from advancing the dialog while the spare is being attempted.
-        self.controller.delay_player_from_advancing_to_next_state(0.5)
+        self.controller.delay_player_from_advancing_to_next_act(0.5)
 
         if self.target not in self.controller.enemies:
             self.target = self.controller.enemies[0]

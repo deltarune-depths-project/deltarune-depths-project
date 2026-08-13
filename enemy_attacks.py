@@ -6,7 +6,7 @@ from sprites_and_effects_collection import SpritesAndEffectsCollection
 
 class RainingDiamondAttack(EnemyAttack):
     def __init__(self, sprites_and_effects_collection: SpritesAndEffectsCollection, bullet_board: BulletBoard,
-                 attacker, enemies_list: list, frequency: float = 1.0):
+                 enemies_list: list, attacker = None, frequency: float = 1.0):
         super().__init__(
             sprites_and_effects_collection=sprites_and_effects_collection,
             duration=10.0
@@ -31,7 +31,8 @@ class RainingDiamondAttack(EnemyAttack):
                     raining_diamond_bullet_pattern = RainingDiamondBulletPattern(
                         sprites_and_effects_collection=self.sprites_and_effects_collection,
                         bullet_board=self.bullet_board,
-                        frequency=1 / number_of_unique_enemies_in_battle
+                        frequency=1 / number_of_unique_enemies_in_battle,
+                        attacker=self.attacker
                     )
                     self.sprites_and_effects_collection.effects.append(raining_diamond_bullet_pattern)
                     self.bullet_patterns.append(raining_diamond_bullet_pattern)

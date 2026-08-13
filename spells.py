@@ -79,7 +79,7 @@ class Spell:
 
         # Tell the battle controller to postpone the player advancing their queued actions until the spell is complete.
         if self.time_before_player_can_advance_past_spell is not None:
-            controller.delay_player_from_advancing_to_next_state(self.time_before_player_can_advance_past_spell)
+            controller.delay_player_from_advancing_to_next_act(self.time_before_player_can_advance_past_spell)
 
     def spell_damage_function(self, caster, target) -> float:
         """
@@ -128,7 +128,7 @@ class Spell:
             elif self.is_friendly_spell:
                 target.modify_hp(self.spell_healing_function(self.caster))
             else:
-                damage_dealt = self.spell_damage_function(self.caster, target)
+                damage_dealt = int(self.spell_damage_function(self.caster, target))
                 if self.element_id:
                     for element in default_data.ELEMENTAL_PAIRS:
                         if element.element_id == self.element_id:
@@ -289,7 +289,7 @@ class FireShock(Spell):
         :return: None
         """
 
-        return (max(caster.magic - 10, 1) * 30) + 90 + random.randint(1, 10)
+        return (max(caster.magic - 10, 1) * 30) + 90 + random.randint(1, 10) / (target.defense / 16)
 
     def affect_targets_with_spell(self):
         super().affect_targets_with_spell()
@@ -330,9 +330,38 @@ class HealPrayer(Spell):
         """
         return 5 * caster.get_total_magic()
 
+class DualHeal(Spell):
+    def __init__(self):
+        super().__init__(
+            name="Dual Heal",
+            description="Heals everyone",
+            tp_cost=50,
+            base_health_change=0,
+            is_friendly_spell=True,
+            is_healing_spell=True,
+            is_pacifying_spell=False,
+            is_aoe_spell=True,
+            animation=HealAnimation(target=None),
+            time_before_battle_idle=0.9,
+            time_before_animation_begins=0.5,
+            time_before_target_affected_by_spell=0.5,
+            time_before_player_can_advance_past_spell=1.5
+        )
+
+    def spell_healing_function(self, caster) -> float:
+        """
+        Calculates the damage healed by the spell depending on caster stats.
+        :return:
+        """
+        return 4 * caster.get_total_magic()
+
+    def cast_spell(self, caster, targets, controller):
+        super().cast_spell(caster, targets, controller)
+
 
 class RudeBuster(Spell):
-    def __init__(self):
+    def __init__(self, beam_texture_path: str = "assets/sprites/effects/rude_buster_beam",
+                 beam_scale_multiplier: float = 1.0):
         super().__init__(
             name="Rude Buster",
             description="Rude Damage",
@@ -343,12 +372,15 @@ class RudeBuster(Spell):
             is_healing_spell=False,
             is_pacifying_spell=False,
             is_aoe_spell=False,
-            animation=RudeBusterAnimation(caster=None, target=None),
+            animation=RudeBusterAnimation(caster=None, target=None, beam_texture_path=beam_texture_path, beam_scale_multiplier=beam_scale_multiplier),
             time_before_battle_idle=1.4,
             time_before_animation_begins=0.8,
             time_before_target_affected_by_spell=1.3,
             time_before_player_can_advance_past_spell=2.4
         )
+
+        self.beam_texture_path = beam_texture_path
+        self.beam_scale_multiplier = beam_scale_multiplier
 
         # This is the amount of additional damage that will be dealt by Rude Buster depending on the frame
         self.damage_addition_amount_list = [30, 28, 20, 13, 11, 10, 7]
@@ -361,7 +393,7 @@ class RudeBuster(Spell):
             confirm_damage = self.damage_addition_amount_list[self.frames_between_confirm_and_impact]
         else:
             confirm_damage = 0
-        return (caster.get_total_attack() * 11) + (caster.get_total_magic() * 5) - (target.defense * 3) + confirm_damage
+        return int(((caster.get_total_attack() * 11) + (caster.get_total_magic() * 5) - (target.defense * 3) + confirm_damage) / (target.defense / 16))
 
     def cast_spell(self, caster, targets, controller):
         """
@@ -388,13 +420,13 @@ class RudeBuster(Spell):
 
         # Tell the battle controller to postpone the player advancing their queued actions until the spell is complete.
         if self.time_before_player_can_advance_past_spell is not None:
-            controller.delay_player_from_advancing_to_next_state(self.time_before_player_can_advance_past_spell)
+            controller.delay_player_from_advancing_to_next_act(self.time_before_player_can_advance_past_spell)
 
     def animate_spell(self, caster, targets: list[character.Character], sprites_and_effects_collection: SpritesAndEffectsCollection):
         """ Animate the spell being cast. """
         if self.animation:
             target = targets[0]
-            new_animation = self.animation.__class__(caster, target, sprites_and_effects_collection)
+            new_animation = self.animation.__class__(caster, target, sprites_and_effects_collection, self.beam_texture_path, self.beam_scale_multiplier)
             sprites_and_effects_collection.effects.append(new_animation)
             new_animation.center_x = target.center_x
             new_animation.center_y = target.center_y
@@ -412,6 +444,22 @@ class RudeBuster(Spell):
                         sprites_and_effects_collection.effects_sprites_3.append(animated_sprite.sprite)
 
             new_animation.parent_spell = self
+
+
+class RedBuster(RudeBuster):
+    def __init__(self):
+        super().__init__(beam_texture_path="assets/sprites/effects/red_buster_beam", beam_scale_multiplier=1.15)
+        self.name = "Red Buster"
+        self.description = "Red Damage"
+        self.tp_cost = 60
+        self.element_id = 9
+
+    def spell_damage_function(self, caster, target):
+        if self.frames_between_confirm_and_impact < len(self.damage_addition_amount_list):
+            confirm_damage = self.damage_addition_amount_list[self.frames_between_confirm_and_impact]
+        else:
+            confirm_damage = 0
+        return int(((caster.get_total_attack() * 13) + (caster.get_total_magic() * 6) - (target.defense * 6) + confirm_damage + 90) / (target.defense / 16))
 
 
 class SleepMist(Spell):

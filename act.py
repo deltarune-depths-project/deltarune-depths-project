@@ -6,14 +6,16 @@ class Act:
     An abstract Act method. The parent class that all types of acts should inherit from.
     """
     def __init__(self, name: str = "Placeholder Act Name", description: str = "Performs an act",
-                 perform_act_text: str = "", tp_cost: float = 0.0, time_before_player_can_advance_past_act: float = 0.5):
+                 perform_act_text: str = "", tp_cost: float = 0.0, time_before_player_can_advance_past_act: float = 0.5,
+                 suppress_actions_queue_update: bool = False):
         self.name = name  # The name of the act in the ACT menu.
         self.description = description  # The description of the act displayed in the ACT menu when hovered over.
         self.perform_act_text = perform_act_text  # Dialog box text when the act is performed
         self.tp_cost = tp_cost  # It's rare, but some acts have a TP cost.
         self.time_before_player_can_advance_past_act = time_before_player_can_advance_past_act  # If provided, the amount of time player input will be delayed while the spell is being cast
+        self.suppress_actions_queue_update = suppress_actions_queue_update  # If True, prevents user input from advancing the actions queue.
 
-    def perform_act(self, actor, target, dialogue_box):
+    def perform_act(self, actor, target, controller):
         """
         Executes the act. This is a stub for child classes
         :return: None
@@ -35,14 +37,22 @@ class SimpleAct(Act):
             perform_act_text: str = "You just performed an act!",
             mercy_percentage: float = 0.0,
             tired_percentage: float = 0.0,
-            actor_animation_state: str = ""
+            actor_animation_state: str = "",
+            time_before_player_can_advance_past_act: float = 0.5,
+            suppress_actions_queue_update: bool = False
     ):
-        super().__init__(name, description, perform_act_text, tp_cost)
+        super().__init__(
+            name=name,
+            description=description,
+            perform_act_text=perform_act_text,
+            tp_cost=tp_cost,
+            time_before_player_can_advance_past_act=time_before_player_can_advance_past_act,
+            suppress_actions_queue_update=suppress_actions_queue_update)
         self.mercy_percentage = mercy_percentage  # Mercy granted to the enemy the act is performed on (between 0 and 100)
         self.tired_percentage = tired_percentage  # Tired granted to the enemy the act is performed on (between 0 and 100)
         self.actor_animation_state = actor_animation_state  # The animation the actor is briefly given when they perform the act.
 
-    def perform_act(self, actor, target, dialogue_box):
+    def perform_act(self, actor, target, controller):
         """
         Executes the act.
         :return: None
@@ -60,7 +70,7 @@ class SimpleAct(Act):
 
         # Load the act dialogue into the dialogue box, if there is any.
         if self.perform_act_text:
-            dialogue_box.load_dialog(BattleTextBoxDialog(text=self.perform_act_text, sprites_and_effects_collection=actor.sprites_and_effects_collection))
+            controller.battle_textbox.load_dialog(BattleTextBoxDialog(text=self.perform_act_text, sprites_and_effects_collection=actor.sprites_and_effects_collection))
 
         # If the mercy/tired percentages are greater than zero, have the target receive them.
         if self.mercy_percentage > 0.0:
@@ -81,14 +91,64 @@ class MagicUserAct(SimpleAct):
 
     def __init__(self, player, enemy_type: type, name: str = "", description: str = "",
                  perform_act_text: str = "", tp_cost: float = 0.0, mercy_percentage: float = 0.0,
-                 tired_percentage: float = 0.0):
+                 tired_percentage: float = 0.0, time_before_player_can_advance_past_act: float = 0.5,
+                 suppress_actions_queue_update: bool = False):
 
         if not name:
             name = player.name[0].upper() + "-Action"
-        super().__init__(name=name, description=description, perform_act_text=perform_act_text, tp_cost=tp_cost)
+        super().__init__(
+            name=name,
+            description=description,
+            perform_act_text=perform_act_text,
+            tp_cost=tp_cost,
+            time_before_player_can_advance_past_act=time_before_player_can_advance_past_act,
+            suppress_actions_queue_update=suppress_actions_queue_update
+        )
 
         self.player = player
         self.enemy_type = enemy_type
         self.mercy_percentage = mercy_percentage
         self.tired_percentage = tired_percentage
+
+
+class MultiUserAct(SimpleAct):
+    """
+    An act that requires multiple users to cast.
+
+    Can only be used by ACT users instead of MAGIC users, as of right now. Kris is the only character to use ACTs of
+    this sort in the actual game.
+    """
+
+    def __init__(
+        self,
+        name: str = "Placeholder Act Name",
+        description: str = "Performs an act",
+        perform_act_text: str = "",
+        tp_cost: float = 0.0,
+        time_before_player_can_advance_past_act: float = 0.5,
+        suppress_actions_queue_update: bool = False,
+        additional_actors: list = [],
+        additional_actors_animation_states: list[str] = [],
+    ):
+        super().__init__(
+            name=name,
+            description=description,
+            perform_act_text=perform_act_text,
+            tp_cost=tp_cost,
+            time_before_player_can_advance_past_act=time_before_player_can_advance_past_act,
+            suppress_actions_queue_update=suppress_actions_queue_update
+        )
+
+        self.additional_actors = additional_actors
+        self.additional_actors_animation_states = additional_actors_animation_states
+
+    def perform_act(self, actor, target, controller):
+        super().perform_act(actor, target, controller)
+        additional_player_index = 0
+        for additional_actor in self.additional_actors:
+            for player in controller.players:
+                if isinstance(player, type(additional_actor)):
+                    if self.additional_actors_animation_states[additional_player_index] in player.get_valid_animation_states():
+                        player.set_animation_state(self.additional_actors_animation_states[additional_player_index])
+                    break
 
