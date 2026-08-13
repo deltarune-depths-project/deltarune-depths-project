@@ -629,13 +629,14 @@ class BattleController:
             else:
                 not_knocked_out_next_character_found = True
 
+        self.menu_select_sound.play()
+
         if self.current_player_index + next_character_index_change < self.focus_stack.get_highest_member().get_full_layout_length():
             self.state = BattleState.PLAYER_COMMAND
             self.focus_stack.pop()
             self.battle_player_character_cards.children[self.current_player_index].unfocus()
             self.current_player_index += next_character_index_change
             self.battle_player_character_cards.children[self.current_player_index].focus()
-            self.menu_select_sound.play()
             self.focus_stack.push(
                 self.battle_player_character_cards,
                 self.battle_player_character_cards.children[self.current_player_index].children[0],
